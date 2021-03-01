@@ -1,84 +1,77 @@
 const axios = require('axios');
 
-let ID = document.createElement("input");
-ID.setAttribute("type", "text");
-document.body.appendChild(ID);
+//მაგალითები
+let postsTable = document.querySelector('#posts-table');
+let commentsTable = document.querySelector('#comments-table');
+let getPostsButton = document.querySelector('#get-posts');
 
-let button = document.createElement("input");
-button.setAttribute("type", "button");
-button.setAttribute("value", "search")
-document.body.appendChild(button);
+fetch('https://jsonplaceholder.typicode.com/todos/1')
+.then(response => response.json())
+.then(json => console.log(json))
+getPostsButton.addEventListener('click', () => {
+  getPosts();
+})
 
-let table = document.createElement("table");
-document.body.appendChild(table);
-table.setAttribute("border", "1");
-table.style.borderCollapse = "collapse";
-table.style.textAlign = "center";
-
-button.onclick = function () {
-  let input = ID.value
-  fetch('https://jsonplaceholder.typicode.com/posts?userId=' + input)
+function getPosts() {
+  let userId = document.getElementById('user-id').value;
+  fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
     .then(response => response.json())
-    .then(json => {
-      table.innerHTML = "";
-      var headers = ["title", "body", ""];
-      for (var i = 0; i < 3; i++) {
-        var td = document.createElement("td");
-        td.innerHTML = headers[i];
-        table.appendChild(td);
-      }
-
-      json.forEach((post) => {
-        var postData = [post.title, post.body, "", " "]
-        var tr = document.createElement("tr");
-        table.appendChild(tr);
-        for (var j = 0; j < 4; j++) {
-          if (j < 2) {
-            var td = document.createElement("td");
-            td.innerHTML = postData[j];
-            tr.appendChild(td);
-          } else if (j == 2) {
-            var td = document.createElement("td");
-            var btn = document.createElement("input");
-            btn.setAttribute("type", "button");
-            btn.setAttribute("value", "view comments");
-            btn.setAttribute("id", post.id);
-            btn.setAttribute("class", "commentButton");
-            td.appendChild(btn);
-            tr.appendChild(td);
-          } else {
-            var td = document.createElement("td");
-            td.setAttribute("class", "commentSpace");
-            td.style.border = "none";
-            td.innerHTML = postData[j];
-            tr.appendChild(td);
-          }
-        }
-      })
-
-      document.querySelectorAll('.commentButton').forEach(btn => {
-        btn.addEventListener("click", function (e) {
-          axios.get("https://jsonplaceholder.typicode.com/comments?postId=" + btn.id)
-            .then(response => {
-              document.querySelectorAll(".commentSpace").forEach(element => {
-                element.innerHTML = ""
-              })
-              var newTable = document.createElement("table");
-              response.data.forEach(element => {
-                var tr = document.createElement("tr");
-                var td = document.createElement("td");
-                tr.appendChild(td);
-                td.innerText = element.body;
-                newTable.appendChild(tr);
-              })
-              e.target.parentNode.parentNode.querySelector(".commentSpace").appendChild(newTable);
-              newTable.setAttribute("border", "1");
-            })
-
-          document.querySelectorAll("tr").forEach(element => element.style.background = "")
-          e.target.closest("tr").style.background = "green";
-          e.target.parentNode.parentNode.querySelector(".commentSpace").style.background = "white"
-        });
-      })
-    })
+    .then(json => displayPosts(json));
 }
+
+
+
+axios.get('https://jsonplaceholder.typicode.com/todos/1')
+.then((response) => {
+  console.log(response.data);
+})
+.catch(function (error) {
+  console.log(error);
+});
+function displayPosts(posts) {
+  document.querySelectorAll('table').forEach(table => table.classList.remove('active'));
+  commentsTable.querySelector('tbody').innerHTML = '';
+  postsTable.querySelector('tbody').innerHTML = '';
+  posts.forEach(post => {
+    let tr = document.createElement('tr');
+    let rowSingle = `
+      <td>${post.title}</td>
+      <td>${post.body}</td>
+      <td>
+        <button id='${post.id}' class="get-comments">See Comments</button>
+      </td>
+    `
+    tr.innerHTML = rowSingle;
+    postsTable.querySelector('tbody').appendChild(tr);
+  })
+  document.querySelectorAll('.get-comments').forEach(button => button.addEventListener('click', (e) => {
+    getComments(e.target);
+  }));
+  document.querySelector('#posts-table').classList.add('active');
+}
+
+function getComments(btn) {
+  let id = btn.getAttribute('id');
+  axios.get(`https://jsonplaceholder.typicode.com/comments?postId=${id}`)
+    .then((response) => {
+      displayComments(response.data);
+      document.querySelectorAll('#posts-table tr').forEach(tr => tr.classList.remove('active'));
+      btn.closest('tr').classList.add('active');
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
+function displayComments(comments) {
+  commentsTable.classList.add('active');
+  commentsTable.querySelector('tbody').innerHTML = '';
+  comments.forEach(comment => {
+    let tr = document.createElement('tr');
+    let rowSingle = `
+      <td>${comment.body}</td>
+    `
+    tr.innerHTML = rowSingle;
+    commentsTable.querySelector('tbody').appendChild(tr);
+  })
+} 
