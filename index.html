@@ -3,7 +3,78 @@
 <head>
   <meta charset="utf-8">
 </head>
+<style>
+  .uppercase {
+    text-transform: uppercase;
+  }
+
+  table {
+    margin-top: 50px;
+    border-collapse: collapse;
+    display: none;
+    margin-right: 20px;
+  }
+
+  td {
+    padding: 5px 8px;
+  }
+
+  table.active {
+    display: block;
+  }
+
+  .form-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .tables {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  #comments-table {
+    width: 55%;
+  }
+
+  .input-wrapper {
+    width: 300px;
+    margin: 0 auto;
+  }
+
+  tr.active {
+    background-color: lightskyblue;
+  }
+</style>
+
 <body>
+  <div class="input-wrapper">
+    <p><b>Search Posts:</b></p>
+    <input type="text" id="user-id" placeholder="enter id">
+    <button id="get-posts">Get Posts</button>
+  </div>
+  <div class="tables">
+    <table border="1" id="posts-table">
+      <thead>
+        <tr>
+          <th class="uppercase">Title</th>
+          <th class="uppercase">Post</th>
+          <th class="uppercase">Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <table id="comments-table" border="1">
+      <thead>
+        <tr>
+          <th class="uppercase">Comments</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
   <script src="bundle.js"></script>
 </body>
-</html>
+
+</html> 
